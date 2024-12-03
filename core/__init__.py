@@ -7,6 +7,8 @@ import core.metrics
 import core.scheduler
 import core.data
 import core.loss
+import core.model
+import core.optim
 
 class Model(nn.Module):
     """
@@ -21,7 +23,7 @@ class Model(nn.Module):
         # 先载入我们的信息
         config = self._load_config(config)
         self.model_config = config
-        self.model = get_model
+        self.model = core.model.get_model(model, **self.model_config)
 
     def forward(self, x):
         return self.model(x)
@@ -32,13 +34,11 @@ class Model(nn.Module):
         self.val_config = config["val"]
 
 
-        train_data =
-        CustomDataLoader = getattr(core.data, self.train_config["dataloader"])
-        train_dataloader = CustomDataLoader(train_data, self.train_config["batch_size"])
+        train_data = core.data.get_dataset(**self.train_config["dataset"])
+        train_dataloader = core.data.get_dataloader(train_data, **self.train_config["dataloader"])
+        loss_fn = core.loss.get_loss_fn(self.train_config["loss_fn"])
 
-        loss_fn = getattr(core.loss, self.train_config["loss_fn"])()
-
-        optimizer = getattr(torch.optim, self.train_config['optimizer'])(self.model.parameters())
+        optimizer = core.optim.get_optimizer(self.model.parameters(), self.train_config["optimizer"], **self.train_config["optimizer_args"])
         # if hasattr(optimizer, config['lr_scheduler']):
         #     lr_scheduler = getattr(torch.optim.lr_scheduler, config['lr_scheduler'])
         # else:
@@ -52,7 +52,6 @@ class Model(nn.Module):
                 loss.backward()
                 optimizer.step()
                 # lr_scheduler.step()
-
                 print(loss)
 
     def val_model(self):

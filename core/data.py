@@ -6,14 +6,14 @@ from torch.utils.data import DataLoader, Dataset
 
 
 
-def get_dataset(dataset: str, mode: str = 'train'):
-    if os.path.exists(dataset):
+def get_dataset(data: str, mode: str = 'train'):
+    if os.path.exists(data):
         if mode == ["train", "valid", "test"]:
-            return ImageLabelDataset(os.path.join(dataset, mode, "images"), os.path.join(dataset, mode, "labels"))
+            return ImageLabelDataset(os.path.join(data, mode, "images"), os.path.join(data, mode, "labels"))
         else:
             raise ValueError(f"模式填错了，你填成了：{mode}")
-    elif hasattr(custom.dataset, dataset):
-        return getattr(custom.dataset, dataset)(mode=mode)
+    elif hasattr(custom.dataset, data):
+        return getattr(custom.dataset, data)(train=mode)
     else:
         raise ValueError(f"没有这种数据集，请你重新确定数据集！")
 

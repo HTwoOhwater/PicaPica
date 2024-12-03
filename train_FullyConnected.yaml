@@ -1,25 +1,24 @@
 train:
-
   optimizer: Adam
   optimizer_args:
-    learning_rate: 0.01
-    moumentium: 0.937
+    lr: 0.01
 
   dataset:
     data: mnist
     mode: train
-    preprocess: 123
+
 
   dataloader:
     shuffle: True
     batch_size: 16
     num_workers: 8
 
-  loss_fn: CrossEntropyLoss
 
+  loss_fn: CrossEntropyLoss
+  epochs: 10
   scheduler: None
 
-valid:
+val:
   dataset:
     data: mnist
     mode: valid

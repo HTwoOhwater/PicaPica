@@ -1,3 +1,26 @@
-epoch: 100
-batchsize: 100
-lr: 0.01
+train:
+
+  optimizer: Adam
+  optimizer_args:
+    learning_rate: 0.01
+    moumentium: 0.937
+
+  dataset:
+    data: mnist
+    mode: train
+    preprocess: 123
+
+  dataloader:
+    shuffle: True
+    batch_size: 16
+    num_workers: 8
+
+  loss_fn: CrossEntropyLoss
+
+  scheduler: None
+
+valid:
+  dataset:
+    data: mnist
+    mode: valid
+    preprocess: 123

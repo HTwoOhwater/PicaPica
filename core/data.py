@@ -1,46 +1,22 @@
-import numpy as np
-import torch
-from torch.utils.data import Dataset, DataLoader
-from PIL import Image
-from torchvision.datasets import MNIST
-import os
+import custom.dataset
+import custom.preprocess
 
-class ImageLabelDataset(Dataset):
-    def __init__(self, image_path, label_path):
-        self.image_path = image_path
-        self.label_path = label_path
-
-        self.images = []
-        self.labels = []
-
-        image_list = os.listdir(self.image_path)
-        label_list = os.listdir(self.label_path)
-
-        for image, label in (image_list, label_list):
-            image = Image.open(os.path.join(self.image_path, image))
-            image.convert('RGB')
-            image = np.array(image)
-            self.images.append(image)
-
-            with open(os.path.join(self.label_path, label), 'r') as f:
-                lines = []
-                for line in f.readlines():
-                    lines.append(line.strip('\n').strip(''))
-                lines = np.array(lines)
-                self.labels.append(lines)
-        self.images = np.array(self.images)
-        self.labels = np.array(self.labels)
-        self.labels = torch.from_numpy(self.labels)
-        self.images = torch.from_numpy(self.images)
+from custom.dataset import *
+from torch.utils.data import DataLoader, Dataset
 
 
 
+def get_dataset(dataset: str, mode: str = 'train'):
+    if os.path.exists(dataset):
+        if mode == ["train", "valid", "test"]:
+            return ImageLabelDataset(os.path.join(dataset, mode, "images"), os.path.join(dataset, mode, "labels"))
+        else:
+            raise ValueError(f"模式填错了，你填成了：{mode}")
+    elif hasattr(custom.dataset, dataset):
+        return getattr(custom.dataset, dataset)(mode=mode)
+    else:
+        raise ValueError(f"没有这种数据集，请你重新确定数据集！")
 
-    def __len__(self):
-        assert len(self.images) == len(self.labels), "图像数据和标注数据不匹配"
-        return len(self.images)
-
-    def __getitem__(self, item):
-        return self.images[item], self.labels[item]
-
-
+def get_dataloader(dataset: Dataset, shuffle: bool, batch_size: int, num_workers: int, collate_fn=None):
+    DataLoader(dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn)
+    return DataLoader(dataset)

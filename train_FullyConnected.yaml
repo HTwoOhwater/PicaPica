@@ -10,9 +10,16 @@ train:
 
   dataloader:
     shuffle: True
-    batch_size: 16
+    batch_size: 500
     num_workers: 8
 
+  callbacks:
+    train_start: default
+    epoch_start: default
+    batch_start: default
+    batch_end: batch_status
+    epoch_end: default
+    train_end: default
 
   loss_fn: CrossEntropyLoss
   epochs: 10
